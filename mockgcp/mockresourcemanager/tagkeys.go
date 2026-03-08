@@ -62,12 +62,14 @@ func (s *TagKeys) ListTagKeys(ctx context.Context, req *pb.ListTagKeysRequest) (
 	findParent := ""
 	tokens := strings.Split(req.GetParent(), "/")
 	if len(tokens) == 2 && tokens[0] == "projects" {
-		project, err := s.Projects.GetProjectByIDOrNumber(req.Parent)
+		project, err := s.Projects.GetProjectByIDOrNumber(tokens[1])
 		if err != nil {
 			return nil, err
 		}
 
 		findParent = fmt.Sprintf("projects/%d", project.Number)
+	} else if len(tokens) == 2 && tokens[0] == "organizations" {
+		findParent = req.GetParent()
 	} else {
 		return nil, fmt.Errorf("parent %q is not valid for mock", req.GetParent())
 	}
